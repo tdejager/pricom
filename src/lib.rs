@@ -8,6 +8,11 @@ mod native;
 #[cfg(not(target_arch = "wasm32"))]
 pub use native::generate;
 
+#[cfg(target_arch = "wasm32")]
+mod web;
+#[cfg(target_arch = "wasm32")]
+pub use web::generate;
+
 /// Generate a rotation
 /// 0 - 256 degrees
 fn generate_rotation_angle(hash: &[u8]) -> u8 {
@@ -118,11 +123,4 @@ fn generate_data<S: Into<String>>(input: S, options: SvgOptions) -> SVGData {
         rect,
         viewbox: (options.width, options.height)
     }
-}
-
-
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
-pub fn generate(name: &str, options: Option<SvgOptions>) {
-    crate::generate_data(name, options.unwrap_or_default());
 }
