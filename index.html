@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Generate Pricon image</title>
+</head>
+
+<body>
+<script type="module">
+    // The filename has to match your project name.
+    import init, { generate } from './pkg/pricon.js';
+
+    export function changeName() {
+        const input = document.getElementById("nameInput");
+        const element = generate(input.value, null);
+        const svgDiv = document.getElementById("svgDiv");
+        svgDiv.innerHTML = "";
+        svgDiv.appendChild(element);
+    }
+
+    // Intialize wasm stuff
+    await init();
+    // Add it to global window object
+    window.changeName = changeName;
+</script>
+
+<div>
+    <label id="name" for="nameInput">
+        Name:
+    </label>
+    <input name="name" id="nameInput" oninput="changeName()">
+    <div id="svgDiv" style="margin-top: 2em">
+    </div>
+
+</div>
+</body>
+
+</html>

@@ -13,6 +13,16 @@ mod web;
 #[cfg(target_arch = "wasm32")]
 pub use web::generate;
 
+// Set different allocator for wasm
+#[cfg(target_arch = "wasm32")]
+use lol_alloc::{AssumeSingleThreaded, FreeListAllocator};
+
+// SAFETY: This application is single threaded, so using AssumeSingleThreaded is allowed.
+#[cfg(target_arch = "wasm32")]
+#[global_allocator]
+static ALLOCATOR: AssumeSingleThreaded<FreeListAllocator> =
+    unsafe { AssumeSingleThreaded::new(FreeListAllocator::new()) };
+
 /// Generate a rotation
 /// 0 - 256 degrees
 fn generate_rotation_angle(hash: &[u8]) -> u8 {
@@ -27,9 +37,9 @@ fn generate_hue(hash: &[u8]) -> u16 {
 }
 
 /// Generate the rectangle size
-/// clamp from 5 to 45 pixels
+/// clamp from 20 to 45 pixels
 fn generate_rect_size(hash: &[u8]) -> u8 {
-    5 + (hash[0] % 45) as u8
+    20 + (hash[0] % 45) as u8
 }
 
 /// Options to pass for Svg generation
@@ -40,6 +50,8 @@ pub struct SvgOptions {
     outer_rect_stroke_width: u32,
 }
 
+
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 impl SvgOptions {
     pub fn width(mut self, width: u32) -> Self {
         self.width = width;
